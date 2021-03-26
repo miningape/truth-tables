@@ -1,8 +1,8 @@
-let test = '([not](a[if]b)[or]c)'
+let test = 'not(myval iff other)'
 
 // Lexer splits the test into chunks to be analysed
 const lexer = ( str ) => {
-  let lexerRegex = /[A-Za-z]+|\[.*?\]|[()]{1}/g
+  let lexerRegex = /\\s*(and|not|or|if|iff)*?\\s*|[A-Za-z]+|[()]{1}/g
 
   return str.match( lexerRegex )  
 }
@@ -11,7 +11,7 @@ const lexer = ( str ) => {
 const tokenizer = (lexeme) => {
   let vars = '[A-Za-z]+'
   let operators = ['and', 'or', 'not', 'if', 'iff'];
-  let specOps = `^\\[\\s*(${operators.join('|')})\\s*\\]$`
+  let specOps = `^\\s*(${operators.join('|')})\\s*$`
 
   let varsRegex = new RegExp('^'+vars+'$', 'g')
   let opsRegex = new RegExp(specOps, 'gi')
@@ -26,11 +26,6 @@ const tokenizer = (lexeme) => {
     perenRegex.lastIndex = 0
 
     switch( true ) {
-      case varsRegex.test(lex):
-        if (debug) console.log(`Detected Symbol "${lex}": variable`)
-        tokens.push( new Token(TYPE.VAR, lex) )
-        break;
-      
       case opsRegex.test(lex):
         if (debug) console.log(`Detected Symbol "${lex}": operator`)
         // Reset regex
@@ -43,6 +38,11 @@ const tokenizer = (lexeme) => {
         let perenType = lex == '(' ?  TYPE.OPEN : TYPE.CLOSE
         if (debug) console.log(`Detected Symbol "${lex}": ${perenType}`)
         tokens.push( new Token( perenType, lex) )
+        break;
+      
+      case varsRegex.test(lex):
+        if (debug) console.log(`Detected Symbol "${lex}": variable`)
+        tokens.push( new Token(TYPE.VAR, lex) )
         break;
 
       default:
