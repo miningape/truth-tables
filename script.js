@@ -119,7 +119,7 @@ const combinationGen = ( ) => {
     combinationArray.push( combinationObject )
   }
 
-  if (debug) console.log('\nThe combinations:', combinationArray)
+  if (debug) console.log('\nThe combinations:\n', combinationArray)
 
   return combinationArray
 }
@@ -127,6 +127,7 @@ const combinationGen = ( ) => {
 const interpret = (ast, combinations) => {
   let resultArray = []
   combinations.forEach( option => {
+    console.log('\nStackview for: ', option)
     let stack = []
     ast.forEach( token => {
       switch(token.type) {
@@ -178,8 +179,11 @@ const interpret = (ast, combinations) => {
         default:
           break;
       }
+      if (debug) console.log(token.type, token.value, '\t=>\t', stack)
     })
-    resultArray.push(stack.pop())
+    cur_value = stack.pop()
+    resultArray.push(cur_value)
+    if(debug) console.log(`Value found "${cur_value}"`)
   })
 
   return resultArray
@@ -210,5 +214,6 @@ const run = ( logicStr ) => {
   r = interpret(a, c)
   console.log(r, c) */
   v = run( test )
-  console.log(v)
+  if (debug) console.log('\n')
+  console.log('Result table:\n',v)
 })()
